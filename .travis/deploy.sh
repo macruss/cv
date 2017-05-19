@@ -15,7 +15,7 @@ if [ $TRAVIS_BRANCH == 'master' ] ; then
     git add .
     git status # debug
     git commit -m "Deploy compressed files"
-    git push -f deploy HEAD:master
+    git push -f deploy HEAD:refs/heads/master
 else
     echo "Not deploying, since this branch isn't master."
 fi
