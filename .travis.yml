@@ -10,10 +10,10 @@ branches:
   only:
   - master
 before_install:
-  - bash _scripts/install.sh
+  - bash .travis/install.sh
 script:
-  - bash _scripts/build.sh
-  - bash _scripts/test.sh
+  - bash .travis/build.sh
+  - bash .travis/test.sh
 deploy:
   skip_cleanup: true
   provider: script
