@@ -4,7 +4,8 @@
   "description": "Ruslan Makarenko CV page",
   "main": "index.js",
   "scripts": {
-    "test": "test"
+    "test": "test",
+    "build": "gulp build"
   },
   "repository": {
     "type": "git",
@@ -18,5 +19,21 @@
   "bugs": {
     "url": "https://github.com/macruss/cv/issues"
   },
-  "homepage": "https://github.com/macruss/cv#readme"
+  "homepage": "https://github.com/macruss/cv#readme",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-clean-css": "^3.3.1",
+    "gulp-concat": "^2.6.1",
+    "gulp-gzip": "^1.4.0",
+    "gulp-htmlmin": "^3.0.0",
+    "gulp-if": "^2.0.2",
+    "gulp-pug": "^3.3.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-sass": "^3.1.0",
+    "gulp-size": "^2.1.0",
+    "gulp-sourcemaps": "^2.6.0",
+    "gulp-uglify": "^2.1.2",
+    "gulp-util": "^3.0.8",
+    "run-sequence": "^1.2.2"
+  }
 }

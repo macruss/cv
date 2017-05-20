@@ -1,3 +1,3 @@
 #!/bin/bash
 set -x
-#gulp build
+npm run build
