@@ -82,14 +82,11 @@ gulp.task('compress:css:watch', function() {
 // Minify and compress html
 gulp.task('compress:html', function() {
   var bef = size({title: 'index.html'});
-  var aft = size({title: 'index.min.html.gz'});
+  var aft = size({title: 'index.html.gz'});
   return gulp.src(config.pugFiles)
     .pipe(pug({}))
     .pipe(gulpif(!watching, bef))
     .pipe(htmlmin({collapseWhitespace: true}))
-    .pipe(rename(function(path) {
-      path.basename += '.min';
-    }))
     .pipe(gulp.dest(config.distFolder))
     .pipe(gulpif(!watching, gzip()))
     .pipe(gulpif(!watching, aft))
