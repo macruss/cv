@@ -14,8 +14,6 @@ before_install:
 script:
   - bash .travis/build.sh
   - bash .travis/test.sh
-before_deploy:
-  - cd dist
 deploy:
   skip_cleanup: true
   provider: script
