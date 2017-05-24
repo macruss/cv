@@ -70,7 +70,7 @@ gulp.task('sass:watch', ['sass'], function() {
 
 
 // Minify and compress html
-gulp.task('compress:html', function() {
+gulp.task('html', function() {
   var bef = size({title: 'index.html'});
   var aft = size({title: 'index.html.gz'});
   return gulp.src(config.index)
@@ -90,8 +90,8 @@ gulp.task('compress:html', function() {
 });
 
 // Watch version of html compression
-gulp.task('compress:html:watch', ['compress:html'], function() {
-  gulp.watch(config.pugFiles, ['compress:html']);
+gulp.task('html:watch', ['html'], function() {
+  gulp.watch(config.pugFiles, ['html']);
 });
 
 gulp.task('clean', function () {
@@ -107,7 +107,7 @@ gulp.task('build', function(cb) {
 
   prod = true;
 
-  runSequence('clean', 'sass', 'compress:css', 'compress:html', cb);
+  runSequence('clean', 'sass', 'html', cb);
 });
 
 gulp.task('webserver', function() {
@@ -120,7 +120,7 @@ gulp.task('webserver', function() {
 
 // // Combine all watch tasks for development
 gulp.task('watch:all', function(cb) {
-  runSequence('clean', 'sass:watch', 'compress:html:watch', cb);
+  runSequence('clean', 'sass:watch', 'html:watch', cb);
 });
 
 gulp.task('default', ['webserver', 'watch:all']);
