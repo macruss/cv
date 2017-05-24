@@ -1,0 +1,13 @@
+body {
+  margin: 0;
+  padding: 0;
+  color: #454353;
+}
+
+.container {
+  width: 975px;
+  @media (max-width:975px) {
+    width: 768px;
+  }
+  margin: 0 auto;
+}

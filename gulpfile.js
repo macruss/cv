@@ -13,13 +13,15 @@ var gutil = require('gulp-util');
 var gzip = require('gulp-gzip');
 var runSequence = require('run-sequence');
 var pug = require('gulp-pug');
+var connect = require('gulp-connect');
+var clean = require('gulp-clean');
 
 
-var watching = false;
+var prod = false;
 var base = 'src/';
 
 var config = {
-  scssFile: base + 'assets/scss/style.scss',
+  scssFile: base + 'assets/scss/main.scss',
   cssFiles: [
     base + 'assets/scss/style.css'
   ],
@@ -27,75 +29,74 @@ var config = {
     base + 'assets/js/script.js'
   ],
   pugFiles: [
-    base + 'index.pug'
+    base + '**/*.pug'
   ],
+  index: base + 'index.pug',
   distFolder: './dist'
 };
 
 // Compile scss file
 gulp.task('sass', function() {
+  var bef = size({title: 'all.css'});
+  var aft = size({title: 'all.min.css.gz'});
+
   return gulp.src(config.scssFile)
     .pipe(sourcemaps.init())
     .pipe(sass().on('error', sass.logError))
-    .pipe(concat('style.css'))
-    .pipe(sourcemaps.write('.'))
-    .pipe(gulp.dest(path.dirname(config.scssFile)));
-});
-
-// Watch version of the scss compilation
-gulp.task('sass:watch', function() {
-  watching = true;
-  gulp.watch(config.scssFile, ['sass']);
-});
-
-// Concatenate, minify and compress css assets, with sourcemaps
-gulp.task('compress:css', function() {
-  var bef = size({title: 'all.css'});
-  var aft = size({title: 'all.min.css.gz'});
-  return gulp.src(config.cssFiles)
-    .pipe(gulpif(!watching, bef))
-    .pipe(sourcemaps.init())
+    .pipe(gulpif(prod, bef))
     .pipe(cleanCSS({
       relativeTo: config.distFolder,
       target: config.distFolder,
-      advanced: !watching
+      advanced: prod
     }))
     .pipe(concat('all.min.css'))
     .pipe(sourcemaps.write('.'))
     .pipe(gulp.dest(config.distFolder))
-    .pipe(gulpif(!watching, gzip()))
-    .pipe(gulpif(!watching, aft))
+    .pipe(gulpif(prod, gzip()))
+    .pipe(gulpif(prod, aft))
     .pipe(gulp.dest(config.distFolder))
+    .pipe(gulpif(!prod, connect.reload()))
     .on('finish', function() {
-      if (!watching) {
+      if (prod) {
         gutil.log('CSS Compression: ' + Math.round((bef.size - aft.size) / bef.size * 100) + '%');
       }
     });
 });
 
-// Watch version of css compression
-gulp.task('compress:css:watch', function() {
-  watching = true;
-  gulp.watch(config.cssFiles, ['compress:css']);
+// Watch version of the scss compilation
+gulp.task('sass:watch', ['sass'], function() {
+  gulp.watch(config.scssFile, ['sass']);
 });
+
 
 // Minify and compress html
 gulp.task('compress:html', function() {
   var bef = size({title: 'index.html'});
   var aft = size({title: 'index.html.gz'});
-  return gulp.src(config.pugFiles)
+  return gulp.src(config.index)
     .pipe(pug({}))
-    .pipe(gulpif(!watching, bef))
+    .pipe(gulpif(prod, bef))
     .pipe(htmlmin({collapseWhitespace: true}))
     .pipe(gulp.dest(config.distFolder))
-    .pipe(gulpif(!watching, gzip()))
-    .pipe(gulpif(!watching, aft))
+    .pipe(gulpif(prod, gzip()))
+    .pipe(gulpif(prod, aft))
     .pipe(gulp.dest(config.distFolder))
+    .pipe(gulpif(!prod, connect.reload()))
     .on('finish', function() {
-      if (!watching) {
+      if (prod) {
         gutil.log('HTML Compression: ' + Math.round((bef.size - aft.size) / bef.size * 100) + '%');
       }
     });
+});
+
+// Watch version of html compression
+gulp.task('compress:html:watch', ['compress:html'], function() {
+  gulp.watch(config.pugFiles, ['compress:html']);
+});
+
+gulp.task('clean', function () {
+  return gulp.src('dist/**/*.*', {read: false})
+    .pipe(clean());
 });
 
 
@@ -103,9 +104,23 @@ gulp.task('compress:html', function() {
 gulp.task('build', function(cb) {
   // change this to gulp.series from gulp 4.0 onwards
   // see https://github.com/OverZealous/run-sequence
-  runSequence(/*'sass', 'compress:css', */'compress:html', cb);
+
+  prod = true;
+
+  runSequence('clean', 'sass', 'compress:css', 'compress:html', cb);
+});
+
+gulp.task('webserver', function() {
+  connect.server({
+    root: 'dist',
+    livereload: true
+  });
 });
 
 
-// Combine all watch tasks for development
-gulp.task('watch:all', ['sass:watch', 'compress:css:watch']);
+// // Combine all watch tasks for development
+gulp.task('watch:all', function(cb) {
+  runSequence('clean', 'sass:watch', 'compress:html:watch', cb);
+});
+
+gulp.task('default', ['webserver', 'watch:all']);
