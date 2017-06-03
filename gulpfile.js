@@ -15,23 +15,28 @@ var runSequence = require('run-sequence');
 var pug = require('gulp-pug');
 var connect = require('gulp-connect');
 var clean = require('gulp-clean');
+var moduleImporter = require('sass-module-importer');
 
 
 var prod = false;
-var base = 'src/';
+const BASE_URL = 'src/';
 
 var config = {
-  scssFile: base + 'assets/scss/main.scss',
+  scssFile: BASE_URL + 'assets/scss/index.scss',
+  scssFiles: BASE_URL + 'assets/scss/*.scss',
   cssFiles: [
-    base + 'assets/scss/style.css'
+    BASE_URL + 'assets/scss/style.css'
   ],
   jsFiles: [
-    base + 'assets/js/script.js'
+    BASE_URL + 'assets/js/script.js'
+  ],
+  images: [
+    BASE_URL + 'assets/images/**/*.*'
   ],
   pugFiles: [
-    base + '**/*.pug'
+    BASE_URL + '**/*.pug'
   ],
-  index: base + 'index.pug',
+  index: BASE_URL + 'index.pug',
   distFolder: './dist'
 };
 
@@ -42,7 +47,7 @@ gulp.task('sass', function() {
 
   return gulp.src(config.scssFile)
     .pipe(sourcemaps.init())
-    .pipe(sass().on('error', sass.logError))
+    .pipe(sass({ importer: moduleImporter() }).on('error', sass.logError))
     .pipe(gulpif(prod, bef))
     .pipe(cleanCSS({
       relativeTo: config.distFolder,
@@ -65,7 +70,7 @@ gulp.task('sass', function() {
 
 // Watch version of the scss compilation
 gulp.task('sass:watch', ['sass'], function() {
-  gulp.watch(config.scssFile, ['sass']);
+  gulp.watch(config.scssFiles, ['sass']);
 });
 
 
@@ -94,9 +99,16 @@ gulp.task('html:watch', ['html'], function() {
   gulp.watch(config.pugFiles, ['html']);
 });
 
-gulp.task('clean', function () {
-  return gulp.src('dist/**/*.*', {read: false})
+
+gulp.task('images', function() {
+  return gulp.src(config.images)
+    .pipe(gulp.dest(config.distFolder + '/assets/images'))
+})
+
+gulp.task('clean', function (cb) {
+  return gulp.src('dist', {read: false})
     .pipe(clean());
+    cb();
 });
 
 
@@ -107,7 +119,7 @@ gulp.task('build', function(cb) {
 
   prod = true;
 
-  runSequence('clean', 'sass', 'html', cb);
+  runSequence('clean', 'sass', 'html', 'images', cb);
 });
 
 gulp.task('webserver', function() {
@@ -120,7 +132,7 @@ gulp.task('webserver', function() {
 
 // // Combine all watch tasks for development
 gulp.task('watch:all', function(cb) {
-  runSequence('clean', 'sass:watch', 'html:watch', cb);
+  runSequence('clean', 'images', 'sass:watch', 'html:watch', cb);
 });
 
 gulp.task('default', ['webserver', 'watch:all']);

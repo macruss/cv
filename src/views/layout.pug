@@ -1,2 +1,19 @@
-.container
-  h1 Ruslan Makarenko CV page!
+- var assetsUrl='assets/images/'
+.container.container-fluid
+  section.info.row
+    .col-xs-12.col-sm-6.col-md-3
+      .box
+        img(src=assetsUrl + "userpic.png")
+    .col-xs-12.col-sm-6.col-md-7
+      .box
+        .row: .col-sm-offset-1.col-xs-12: .box: h2 Ruslan Makarenko
+        .row
+          .col-sm-offset-1.col-xs-11: .box
+            a(href="//www.linkedin.com/in/ruslan-makarenko-89759b74/")
+              img.logo(src=assetsUrl + "linkedin-logo.svg")
+            a(href="//github.com/macruss")
+              img.logo(src=assetsUrl + "github-logo.svg")
+      
+  section.skils
+  section.expirience
+  section.education
