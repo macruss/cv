@@ -102,8 +102,12 @@ gulp.task('html:watch', ['html'], function() {
 
 gulp.task('images', function() {
   return gulp.src(config.images)
-    .pipe(gulp.dest(config.distFolder + '/assets/images'))
-})
+    .pipe(gulp.dest(config.distFolder + '/assets/images/'))
+});
+
+gulp.task('images:watch', ['images'], function() {
+  gulp.watch(config.images, ['images']);
+});
 
 gulp.task('clean', function (cb) {
   return gulp.src('dist', {read: false})
@@ -132,7 +136,7 @@ gulp.task('webserver', function() {
 
 // // Combine all watch tasks for development
 gulp.task('watch:all', function(cb) {
-  runSequence('clean', 'images', 'sass:watch', 'html:watch', cb);
+  runSequence('clean', 'images:watch', 'sass:watch', 'html:watch', cb);
 });
 
 gulp.task('default', ['webserver', 'watch:all']);
