@@ -1,9 +1,15 @@
 - var assetsUrl='assets/images/'
 .container.container-fluid
-  include info    
-  include skills
-  include expirience
-  include education
+  .row
+    section.col-xs-12.col-sm-4.info: .box
+      include info
+    .col-sm-8: .box
+      section.row.skills
+        include skills
+      section.row.expirience
+        include expirience
+      section.row.education
+        include education
   
 
       

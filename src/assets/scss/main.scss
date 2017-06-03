@@ -1,3 +1,5 @@
+$gray: #ccc;
+
 body {
   box-sizing: border-box;
   padding: 0;
@@ -17,8 +19,18 @@ h6 {
   color: #001A33;
 }
 
-h4 {
+h3 {
   margin: 5px 0;
+  img[src*="logo"] {
+    margin: 0;
+    vertical-align: middle; 
+    display: inline-block;
+  }
+}
+
+a {
+  color: black;
+  text-decoration: none;
 }
 
 .header,
@@ -44,7 +56,41 @@ img {
 
 }
 
+.wrapper {
+  position: fixed;
+  @media screen and (max-width: 48em) {
+    position: static;
+  }
+}
+
 .section-header {
-  border-bottom: 1px solid #ccc;
+  border-bottom: 1px solid $gray;
   padding-bottom: 5px;
+}
+
+.company-name {
+  font-weight: bold;  
+}
+
+#intelli-soft {
+  text-transform: uppercase;
+  color: #00a2c5;
+  span {
+    color: #3f434a;
+  }
+}
+
+#softevol {
+  line-height: 45px;
+
+  img {
+    width: 45px;
+    margin-right: 5px;
+    vertical-align: middle; 
+    display: inline-block;
+  }
+}
+
+.duration {
+  color: gray;
 }
