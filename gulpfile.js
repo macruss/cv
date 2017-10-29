@@ -4,7 +4,7 @@ var sass = require('gulp-sass');
 var concat = require('gulp-concat');
 var sourcemaps = require('gulp-sourcemaps');
 var cleanCSS = require('gulp-clean-css');
-var uglify = require('gulp-uglify');
+var uglify = require('gulp-uglifyes');
 var gulpif = require('gulp-if');
 var rename = require('gulp-rename');
 var htmlmin = require('gulp-htmlmin');
@@ -111,10 +111,11 @@ gulp.task('images:watch', ['images'], function() {
 
 gulp.task('scripts', function() {
   return gulp.src(config.jsFiles)
-    .pipe(gulpif(prod, uglify()))
-    .pipe(gulpif(prod, gzip()))
-    .pipe(gulpif(!prod, connect.reload()))    
-    .pipe(gulp.dest(config.distFolder + '/assets/js/'))
+  .pipe(gulpif(prod, uglify()))
+  .on('error', function (err) { gutil.log(gutil.colors.red('[Error]'), err.toString()); })
+  .pipe(gulpif(prod, gzip()))
+  .pipe(gulpif(!prod, connect.reload()))    
+  .pipe(gulp.dest(config.distFolder + '/assets/js/'))
 });
 
 gulp.task('scripts:watch', ['scripts'], function() {
