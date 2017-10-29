@@ -111,11 +111,14 @@ gulp.task('images:watch', ['images'], function() {
 
 gulp.task('scripts', function() {
   return gulp.src(config.jsFiles)
+  .pipe(sourcemaps.init())
   .pipe(gulpif(prod, uglify()))
   .on('error', function (err) { gutil.log(gutil.colors.red('[Error]'), err.toString()); })
+  .pipe(sourcemaps.write('.'))
+  .pipe(gulp.dest(config.distFolder))  
   .pipe(gulpif(prod, gzip()))
   .pipe(gulpif(!prod, connect.reload()))    
-  .pipe(gulp.dest(config.distFolder + '/assets/js/'))
+  .pipe(gulp.dest(config.distFolder))
 });
 
 gulp.task('scripts:watch', ['scripts'], function() {
