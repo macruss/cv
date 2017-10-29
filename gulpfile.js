@@ -28,7 +28,7 @@ var config = {
     BASE_URL + 'assets/scss/style.css'
   ],
   jsFiles: [
-    BASE_URL + 'assets/js/script.js'
+    BASE_URL + 'assets/js/main.js'
   ],
   images: [
     BASE_URL + 'assets/images/**/*.*'
@@ -109,13 +109,31 @@ gulp.task('images:watch', ['images'], function() {
   gulp.watch(config.images, ['images']);
 });
 
+gulp.task('scripts', function() {
+  return gulp.src(config.jsFiles)
+    .pipe(gulpif(prod, uglify()))
+    .pipe(gulpif(prod, gzip()))
+    .pipe(gulpif(!prod, connect.reload()))    
+    .pipe(gulp.dest(config.distFolder + '/assets/js/'))
+});
+
+gulp.task('scripts:watch', ['scripts'], function() {
+  gulp.watch(config.jsFiles, ['scripts']);
+});
+
 gulp.task('clean', function (cb) {
   return gulp.src('dist', {read: false})
     .pipe(clean());
     cb();
 });
 
-
+const buildTasks = [
+  'clean',
+  'sass',
+  'html',
+  'images',
+  'scripts'
+]
 // Full build task
 gulp.task('build', function(cb) {
   // change this to gulp.series from gulp 4.0 onwards
@@ -123,7 +141,7 @@ gulp.task('build', function(cb) {
 
   prod = true;
 
-  runSequence('clean', 'sass', 'html', 'images', cb);
+  runSequence(...buildTasks, cb);
 });
 
 gulp.task('webserver', function() {
@@ -133,10 +151,16 @@ gulp.task('webserver', function() {
   });
 });
 
-
-// // Combine all watch tasks for development
+const watchTasks = [
+  'clean',
+  'images:watch',
+  'sass:watch',
+  'html:watch',
+  'scripts:watch'
+]
+// Combine all watch tasks for development
 gulp.task('watch:all', function(cb) {
-  runSequence('clean', 'images:watch', 'sass:watch', 'html:watch', cb);
+  runSequence(...watchTasks, cb);
 });
 
 gulp.task('default', ['webserver', 'watch:all']);
