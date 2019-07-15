@@ -151,6 +151,7 @@ gulp.task('build', function(cb) {
 gulp.task('webserver', function() {
   connect.server({
     root: 'dist',
+    port: 8090,
     livereload: true
   });
 });
