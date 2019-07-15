@@ -139,13 +139,14 @@ const buildTasks = [
   'scripts'
 ]
 // Full build task
-gulp.task('build', function build(cb) {
+gulp.task('build', function build(done) {
   // change this to gulp.series from gulp 4.0 onwards
   // see https://github.com/OverZealous/run-sequence
 
   prod = true;
 
-  runSequence(...buildTasks, cb);
+  gulp.series(...buildTasks);
+  done();
 });
 
 gulp.task('webserver', function webserver() {
@@ -164,8 +165,9 @@ const watchTasks = [
   'scripts:watch'
 ]
 // Combine all watch tasks for development
-gulp.task('watch:all', function watchAll(cb) {
-  runSequence(...watchTasks, cb);
+gulp.task('watch:all', function watchAll(done) {
+  gulp.series(...watchTasks);
+  done()
 });
 
 gulp.task('default', gulp.series('webserver', 'watch:all'));
