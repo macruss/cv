@@ -41,7 +41,7 @@ var config = {
 };
 
 // Compile scss file
-gulp.task('sass', function() {
+gulp.task('sass', function sass() {
   var bef = size({title: 'all.css'});
   var aft = size({title: 'all.min.css.gz'});
 
@@ -69,13 +69,13 @@ gulp.task('sass', function() {
 });
 
 // Watch version of the scss compilation
-gulp.task('sass:watch', ['sass'], function() {
+gulp.task('sass:watch', gulp.series('sass', function watchSass() {
   gulp.watch(config.scssFiles, ['sass']);
-});
+}));
 
 
 // Minify and compress html
-gulp.task('html', function() {
+gulp.task('html', function html() {
   var bef = size({title: 'index.html'});
   var aft = size({title: 'index.html.gz'});
   return gulp.src(config.index)
@@ -95,21 +95,21 @@ gulp.task('html', function() {
 });
 
 // Watch version of html compression
-gulp.task('html:watch', ['html'], function() {
-  gulp.watch(config.pugFiles, ['html']);
-});
+gulp.task('html:watch', gulp.series('html', function watchHtml() {
+  gulp.watch(config.pugFiles, gulp.series('html'));
+}));
 
 
-gulp.task('images', function() {
+gulp.task('images', function images() {
   return gulp.src(config.images)
     .pipe(gulp.dest(config.distFolder + '/assets/images/'))
 });
 
-gulp.task('images:watch', ['images'], function() {
-  gulp.watch(config.images, ['images']);
-});
+gulp.task('images:watch', gulp.series('images', function watchImages() {
+  gulp.watch(config.images, gulp.series('images'));
+}));
 
-gulp.task('scripts', function() {
+gulp.task('scripts', function scripts() {
   return gulp.src(config.jsFiles)
   .pipe(sourcemaps.init())
   .pipe(gulpif(prod, uglify()))
@@ -121,11 +121,11 @@ gulp.task('scripts', function() {
   .pipe(gulp.dest(config.distFolder))
 });
 
-gulp.task('scripts:watch', ['scripts'], function() {
-  gulp.watch(config.jsFiles, ['scripts']);
-});
+gulp.task('scripts:watch', gulp.series('scripts', function watchScripts() {
+  gulp.watch(config.jsFiles, gulp.series('scripts'));
+}));
 
-gulp.task('clean', function (cb) {
+gulp.task('clean', function clean(cb) {
   return gulp.src('dist', {read: false})
     .pipe(clean());
     cb();
@@ -139,7 +139,7 @@ const buildTasks = [
   'scripts'
 ]
 // Full build task
-gulp.task('build', function(cb) {
+gulp.task('build', function build(cb) {
   // change this to gulp.series from gulp 4.0 onwards
   // see https://github.com/OverZealous/run-sequence
 
@@ -148,7 +148,7 @@ gulp.task('build', function(cb) {
   runSequence(...buildTasks, cb);
 });
 
-gulp.task('webserver', function() {
+gulp.task('webserver', function webserver() {
   connect.server({
     root: 'dist',
     port: 8090,
@@ -164,8 +164,8 @@ const watchTasks = [
   'scripts:watch'
 ]
 // Combine all watch tasks for development
-gulp.task('watch:all', function(cb) {
+gulp.task('watch:all', function watchAll(cb) {
   runSequence(...watchTasks, cb);
 });
 
-gulp.task('default', ['webserver', 'watch:all']);
+gulp.task('default', gulp.series('webserver', 'watch:all'));
