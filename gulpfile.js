@@ -6,7 +6,6 @@ const sourcemaps = require('gulp-sourcemaps');
 const cleanCSS = require('gulp-clean-css');
 const uglify = require('gulp-uglifyes');
 const gulpif = require('gulp-if');
-const rename = require('gulp-rename');
 const htmlmin = require('gulp-htmlmin');
 const size = require('gulp-size');
 const gutil = require('gulp-util');
