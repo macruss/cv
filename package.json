@@ -42,6 +42,7 @@
     "sass-module-importer": "^1.4.0"
   },
   "dependencies": {
+    "del": "^5.0.0",
     "flexboxgrid": "^6.3.1"
   }
 }

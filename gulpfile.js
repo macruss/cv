@@ -1,21 +1,20 @@
-var path = require('path');
-var gulp = require('gulp');
-var sass = require('gulp-sass');
-var concat = require('gulp-concat');
-var sourcemaps = require('gulp-sourcemaps');
-var cleanCSS = require('gulp-clean-css');
-var uglify = require('gulp-uglifyes');
-var gulpif = require('gulp-if');
-var rename = require('gulp-rename');
-var htmlmin = require('gulp-htmlmin');
-var size = require('gulp-size');
-var gutil = require('gulp-util');
-var gzip = require('gulp-gzip');
-var runSequence = require('run-sequence');
-var pug = require('gulp-pug');
-var connect = require('gulp-connect');
-var clean = require('gulp-clean');
-var moduleImporter = require('sass-module-importer');
+const path = require('path');
+const gulp = require('gulp');
+const sass = require('gulp-sass');
+const concat = require('gulp-concat');
+const sourcemaps = require('gulp-sourcemaps');
+const cleanCSS = require('gulp-clean-css');
+const uglify = require('gulp-uglifyes');
+const gulpif = require('gulp-if');
+const rename = require('gulp-rename');
+const htmlmin = require('gulp-htmlmin');
+const size = require('gulp-size');
+const gutil = require('gulp-util');
+const gzip = require('gulp-gzip');
+const pug = require('gulp-pug');
+const connect = require('gulp-connect');
+const del = require('del');
+const moduleImporter = require('sass-module-importer');
 
 
 var prod = false;
@@ -41,7 +40,7 @@ var config = {
 };
 
 // Compile scss file
-gulp.task('sass', function sass() {
+gulp.task('sass', () => {
   var bef = size({title: 'all.css'});
   var aft = size({title: 'all.min.css.gz'});
 
@@ -69,15 +68,17 @@ gulp.task('sass', function sass() {
 });
 
 // Watch version of the scss compilation
-gulp.task('sass:watch', gulp.series('sass', function watchSass() {
-  gulp.watch(config.scssFiles, ['sass']);
+gulp.task('sass:watch', gulp.series('sass', done => {
+  gulp.watch(config.scssFiles, gulp.series('sass'));
+  done()
 }));
 
 
 // Minify and compress html
-gulp.task('html', function html() {
+gulp.task('html', () => {
   var bef = size({title: 'index.html'});
   var aft = size({title: 'index.html.gz'});
+
   return gulp.src(config.index)
     .pipe(pug({}))
     .pipe(gulpif(prod, bef))
@@ -95,21 +96,23 @@ gulp.task('html', function html() {
 });
 
 // Watch version of html compression
-gulp.task('html:watch', gulp.series('html', function watchHtml() {
+gulp.task('html:watch', gulp.series('html', done => {
   gulp.watch(config.pugFiles, gulp.series('html'));
+  done();
 }));
 
 
-gulp.task('images', function images() {
+gulp.task('images', () => {
   return gulp.src(config.images)
     .pipe(gulp.dest(config.distFolder + '/assets/images/'))
 });
 
-gulp.task('images:watch', gulp.series('images', function watchImages() {
+gulp.task('images:watch', gulp.series('images', done => {
   gulp.watch(config.images, gulp.series('images'));
+  done();
 }));
 
-gulp.task('scripts', function scripts() {
+gulp.task('scripts', () => {
   return gulp.src(config.jsFiles)
   .pipe(sourcemaps.init())
   .pipe(gulpif(prod, uglify()))
@@ -121,15 +124,12 @@ gulp.task('scripts', function scripts() {
   .pipe(gulp.dest(config.distFolder))
 });
 
-gulp.task('scripts:watch', gulp.series('scripts', function watchScripts() {
+gulp.task('scripts:watch', gulp.series('scripts', done => {
   gulp.watch(config.jsFiles, gulp.series('scripts'));
+  done()
 }));
 
-gulp.task('clean', function clean(cb) {
-  return gulp.src('dist', {read: false})
-    .pipe(clean());
-    cb();
-});
+gulp.task('clean', () => del('./dist/*'));
 
 const buildTasks = [
   'clean',
@@ -139,22 +139,24 @@ const buildTasks = [
   'scripts'
 ]
 // Full build task
-gulp.task('build', function build(done) {
+gulp.task('build', async done =>  {
   // change this to gulp.series from gulp 4.0 onwards
   // see https://github.com/OverZealous/run-sequence
 
   prod = true;
 
-  gulp.series(...buildTasks);
-  done();
+  await gulp.series(...buildTasks)();
+
+  done()
 });
 
-gulp.task('webserver', function webserver() {
+gulp.task('webserver', done => {
   connect.server({
     root: 'dist',
     port: 8090,
     livereload: true
   });
+  done()
 });
 
 const watchTasks = [
@@ -165,9 +167,6 @@ const watchTasks = [
   'scripts:watch'
 ]
 // Combine all watch tasks for development
-gulp.task('watch:all', function watchAll(done) {
-  gulp.series(...watchTasks);
-  done()
-});
+gulp.task('watch:all', gulp.series(...watchTasks));
 
 gulp.task('default', gulp.series('webserver', 'watch:all'));
