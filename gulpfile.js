@@ -35,7 +35,11 @@ var config = {
     BASE_URL + '**/*.pug'
   ],
   index: BASE_URL + 'index.pug',
-  distFolder: './dist'
+  distFolder: {
+    root: './dist',
+    css: './dist/css',
+    js: './dist/js'
+  }
 };
 
 // Compile scss file
@@ -48,16 +52,16 @@ gulp.task('sass', () => {
     .pipe(sass({ importer: moduleImporter() }).on('error', sass.logError))
     .pipe(gulpif(prod, bef))
     .pipe(cleanCSS({
-      relativeTo: config.distFolder,
-      target: config.distFolder,
+      relativeTo: config.distFolder.css,
+      target: config.distFolder.css,
       advanced: prod
     }))
     .pipe(concat('all.min.css'))
     .pipe(sourcemaps.write('.'))
-    .pipe(gulp.dest(config.distFolder))
+    .pipe(gulp.dest(config.distFolder.css))
     .pipe(gulpif(prod, gzip()))
     .pipe(gulpif(prod, aft))
-    .pipe(gulp.dest(config.distFolder))
+    .pipe(gulp.dest(config.distFolder.css))
     .pipe(gulpif(!prod, connect.reload()))
     .on('finish', function() {
       if (prod) {
@@ -82,10 +86,10 @@ gulp.task('html', () => {
     .pipe(pug({}))
     .pipe(gulpif(prod, bef))
     .pipe(htmlmin({collapseWhitespace: true}))
-    .pipe(gulp.dest(config.distFolder))
+    .pipe(gulp.dest(config.distFolder.root))
     .pipe(gulpif(prod, gzip()))
     .pipe(gulpif(prod, aft))
-    .pipe(gulp.dest(config.distFolder))
+    .pipe(gulp.dest(config.distFolder.root))
     .pipe(gulpif(!prod, connect.reload()))
     .on('finish', function() {
       if (prod) {
@@ -103,7 +107,7 @@ gulp.task('html:watch', gulp.series('html', done => {
 
 gulp.task('images', () => {
   return gulp.src(config.images)
-    .pipe(gulp.dest(config.distFolder + '/assets/images/'))
+    .pipe(gulp.dest(config.distFolder.root + '/assets/images/'))
 });
 
 gulp.task('images:watch', gulp.series('images', done => {
@@ -117,10 +121,10 @@ gulp.task('scripts', () => {
   .pipe(gulpif(prod, uglify()))
   .on('error', function (err) { gutil.log(gutil.colors.red('[Error]'), err.toString()); })
   .pipe(sourcemaps.write('.'))
-  .pipe(gulp.dest(config.distFolder))  
+  .pipe(gulp.dest(config.distFolder.js))  
   .pipe(gulpif(prod, gzip()))
   .pipe(gulpif(!prod, connect.reload()))    
-  .pipe(gulp.dest(config.distFolder))
+  .pipe(gulp.dest(config.distFolder.js))
 });
 
 gulp.task('scripts:watch', gulp.series('scripts', done => {
@@ -128,7 +132,7 @@ gulp.task('scripts:watch', gulp.series('scripts', done => {
   done()
 }));
 
-gulp.task('clean', () => del('./dist/*'));
+gulp.task('clean', () => del('./dist/**/*.*'));
 
 const buildTasks = [
   'clean',
