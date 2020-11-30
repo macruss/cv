@@ -93,3 +93,16 @@ img {
 .duration {
   color: gray;
 }
+
+@media print {
+  .wrapper {
+    position: relative;
+    &>.row {
+      display: inline-block;
+      margin-right: 20px;
+      &:first-child {
+        width: 30%;
+      }
+    }
+  }
+}
