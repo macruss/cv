@@ -115,22 +115,22 @@ gulp.task('images:watch', gulp.series('images', done => {
   done();
 }));
 
-gulp.task('scripts', () => {
-  return gulp.src(config.jsFiles)
-  .pipe(sourcemaps.init())
-  .pipe(gulpif(prod, uglify()))
-  .on('error', function (err) { gutil.log(gutil.colors.red('[Error]'), err.toString()); })
-  .pipe(sourcemaps.write('.'))
-  .pipe(gulp.dest(config.distFolder.js))  
-  .pipe(gulpif(prod, gzip()))
-  .pipe(gulpif(!prod, connect.reload()))    
-  .pipe(gulp.dest(config.distFolder.js))
-});
+// gulp.task('scripts', () => {
+//   return gulp.src(config.jsFiles)
+//   .pipe(sourcemaps.init())
+//   .pipe(gulpif(prod, uglify()))
+//   .on('error', function (err) { gutil.log(gutil.colors.red('[Error]'), err.toString()); })
+//   .pipe(sourcemaps.write('.'))
+//   .pipe(gulp.dest(config.distFolder.js))  
+//   .pipe(gulpif(prod, gzip()))
+//   .pipe(gulpif(!prod, connect.reload()))    
+//   .pipe(gulp.dest(config.distFolder.js))
+// });
 
-gulp.task('scripts:watch', gulp.series('scripts', done => {
-  gulp.watch(config.jsFiles, gulp.series('scripts'));
-  done()
-}));
+// gulp.task('scripts:watch', gulp.series('scripts', done => {
+//   gulp.watch(config.jsFiles, gulp.series('scripts'));
+//   done()
+// }));
 
 gulp.task('clean', () => del('./dist/**/*.*'));
 
@@ -139,7 +139,7 @@ const buildTasks = [
   'sass',
   'html',
   'images',
-  'scripts'
+  // 'scripts'
 ]
 // Full build task
 gulp.task('build', async done =>  {
@@ -167,7 +167,7 @@ const watchTasks = [
   'images:watch',
   'sass:watch',
   'html:watch',
-  'scripts:watch'
+  // 'scripts:watch'
 ]
 // Combine all watch tasks for development
 gulp.task('watch:all', gulp.series(...watchTasks));
